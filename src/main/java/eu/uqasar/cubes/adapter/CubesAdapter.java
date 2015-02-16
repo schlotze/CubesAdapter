@@ -130,7 +130,6 @@ public class CubesAdapter implements SystemAdapter {
 
         String[] creds = credentials.split(":");
 
-        // TODO: check that user can be split before set
         user.setUsername(creds[0]);
         user.setPassword(creds[1]);
 
@@ -161,7 +160,6 @@ public class CubesAdapter implements SystemAdapter {
         res = resty.json(url);
 
       } catch (IOException e) {
-        System.out.println(counter);
 
         // Check if the limit of trials has been reached
         if(counter<counterLimit){
