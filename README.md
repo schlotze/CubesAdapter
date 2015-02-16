@@ -29,55 +29,29 @@ Furthermore JiraAdapter throws the proposed uQuasarExceptionTypes
     BINDING_SYSTEM_BAD_URI_SYNTAX, (thrown when the binding system base url is malformed)
 
     UQASAR_NOT_EXISTING_METRIC (thrown when the queried metric is not a proper uQasarMetric)
+    
+    ERROR_PARSING_JSON (throw when the JSON received can not be parsed)
 
  
  ---------------------------------------------------------------------
  
-All JiraAdapter methods are tested via junit tests
+All CubesAdapter methods are tested via JUnit tests
 
 ---------------------------------------------------------------------
 
-JiraAdapter can be invoked as Java Library (JAR) from command line as 
+CubesAdapter can be invoked as Java Library (JAR) from command line as 
 
 
-	mvn exec:java -Dexec.mainClass="eu.uqasar.jira.adapter.JiraAdapter" -Dexec.args="http://95.211.223.9:8084 soaptester:soaptester ISSUES_PER_PROJECTS_PER_SYSTEM_INSTANCE"
+	mvn exec:java -Dexec.mainClass="eu.uqasar.cubes.adapter.CubesAdapter" -Dexec.args="http://uqasar.pythonanywhere.com user:password cube/jira/facts"
 	
 OR
 
-	java -cp JiraAdapter-1.0.jar eu.uqasar.jira.adapter.JiraAdapter http://95.211.223.9:8084 soaptester:soaptester ISSUES_PER_PROJECTS_PER_SYSTEM_INSTANCE
-
+	java -cp CubesAdapter-1.0.jar eu.uqasar.cubes.adapter.CubesAdapter http://uqasar.pythonanywhere.com user:password cube/jira/facts
 		
  
 arg0 is the URL binding or the JiraInstallation
 arg1 is the string concatenation of username:password
-arg2 is the desired METRIC
-
---------------------------------------------------------------------
-
-Jira Adapter can be invoked as a library from an external class e.g:public class jiraAdapterInvocation {
-
-    public static void main(String[] args) throws uQasarException {
-        String newLine = System.getProperty("line.separator");
-        List<Measurement> measurements;
-
-        String bindedSystemURL = "http://95.211.223.9:8084";
-        String credentials = "soaptester:soaptester";
+arg2 is the desired METRIC QUERY
 
 
-        JiraAdapter jiraAdapter = new JiraAdapter();
-
-        for (uQasarMetric metric  :uQasarMetric.values()) {
-
-            measurements = jiraAdapter.query(bindedSystemURL, credentials, metric.name());
-
-            for (Measurement measurement : measurements) {
-                System.out.println("----------TEST metric: "+measurement.getMetric()+" ----------"+newLine);
-                System.out.println(measurement.getMeasurement()+newLine+newLine);
-                System.out.println();
-
-            }
-   		}
-
-  		}
-	}
 
