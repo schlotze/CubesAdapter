@@ -7,25 +7,17 @@ CubesAdapter is a project that implements the uQasarAdapter interface overriding
 
 ------------------------------------------------------------------------
 
-JiraAdapter measures all the predefined metrics that are proposed by uQasarAdapter:
+Cubes measures are the predefined metrics that are proposed by uQasarAdapter:
 
 For the time being these metrics are:
-
      
-        PROJECTS_PER_SYSTEM_INSTANCE
-
-        ISSUES_PER_PROJECTS_PER_SYSTEM_INSTANCE
-
-        FIXED_ISSUES_PER_PROJECT
-
-        UNRESOLVED_ISSUES_PER_PROJECT
-
-        UNRESOLVED_BUG_ISSUES_PER_PROJECT
-
-        UNRESOLVED_TASK_ISSUES_PER_PROJECT
-        
-
-
+	AGGREGATE
+	FACT
+    MEMBERS
+    CUBES
+    MODEL
+    CELL
+    FACTS
 
 ----------------------------------------------------------------------
 

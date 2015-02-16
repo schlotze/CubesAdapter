@@ -34,7 +34,9 @@ import eu.uqasar.adapter.query.QueryExpression;
 public class CubesAdapter implements SystemAdapter {
 
 	String value = "";
-	private Integer connectionTrials = 0;
+	  // Counts the number of trials to connect to Rest service, and limits them to 10
+	  private Integer counter = 0;
+	  private Integer counterLimit = 10;
 	
     public CubesAdapter() {
     }
@@ -43,10 +45,9 @@ public class CubesAdapter implements SystemAdapter {
     public List<Measurement> query(BindedSystem bindedSystem, User user, QueryExpression queryExpression) throws uQasarException {
 
         LinkedList<Measurement> measurements = new LinkedList<Measurement>();
-        
+        JSONResource jsonResource = null;
         String measurement = "";
         String url = "";
-        
         
         CubesQueryExpresion cubesQueryExpresion = (CubesQueryExpresion) queryExpression;
 
@@ -59,21 +60,32 @@ public class CubesAdapter implements SystemAdapter {
             	url += "/";
             }        	
             
-            /* START -- Metrics implementation */
-            if (cubesQueryExpresion.getQueryType() == uQasarMetric.AGGREGATE){
-            	// This only retrieves the value
-            	value = getJSONObject(url + cubesQueryExpresion.getQuery(),"summary","count");
-            	measurement = getJSONObject(url + cubesQueryExpresion.getQuery());
-            }   else if ((cubesQueryExpresion.getQueryType() == uQasarMetric.FACT) ||
-            	(cubesQueryExpresion.getQueryType() == uQasarMetric.MEMBERS)){ //JSONObject
-            	measurement = getJSONObject(url + cubesQueryExpresion.getQuery());
-            }   else if (cubesQueryExpresion.getQueryType() == uQasarMetric.CUBES){   //JSONArray
-            	measurement = getJSONArray(url + cubesQueryExpresion.getQuery());
-            }   else if ((cubesQueryExpresion.getQueryType() == uQasarMetric.MODEL) ||   //JSONObject
-            			(cubesQueryExpresion.getQueryType() == uQasarMetric.CELL)){    //JSONObject
-            	measurement = getJSONObject(url + cubesQueryExpresion.getQuery());
-            } 	else if (cubesQueryExpresion.getQueryType() == uQasarMetric.FACTS){   //JSONArray
-            	measurement = getJSONArray(url + cubesQueryExpresion.getQuery());
+            // GET query to REST service is stored as JSONResource
+            jsonResource = getJSON(url + cubesQueryExpresion.getQuery());
+            
+            /* Parse the JSON resource */
+            
+            if (cubesQueryExpresion.getQueryType() == uQasarMetric.AGGREGATE){			//JSONObject
+            	
+				// Parse to get ALL the Object
+				measurement = jsonResource.toObject().toString();
+				// Parse to get the value of the "obj" within the "member"
+				value = jsonResource.toObject().getJSONObject("summary").getString("count");
+            	
+            }   else if (cubesQueryExpresion.getQueryType() == uQasarMetric.FACT ||		//JSONObject
+            		cubesQueryExpresion.getQueryType() == uQasarMetric.MEMBERS|| 
+            		cubesQueryExpresion.getQueryType() == uQasarMetric.MODEL ||
+            		cubesQueryExpresion.getQueryType() == uQasarMetric.CELL){
+            	// Parse to get ALL the Object
+				measurement = jsonResource.toObject().toString();
+				
+            } 	else if (cubesQueryExpresion.getQueryType() == uQasarMetric.FACTS || 
+            		cubesQueryExpresion.getQueryType() == uQasarMetric.CUBES){      	//JSONArray
+            	// Stores the JSON Array 
+				measurement = jsonResource.array().toString();
+				// Count the array elements and set value  
+				value = String.valueOf(jsonResource.array().length());
+				
             } else {
             	throw new uQasarException(uQasarException.UQasarExceptionType.UQASAR_NOT_EXISTING_METRIC,cubesQueryExpresion.getQuery());
             }
@@ -92,16 +104,17 @@ public class CubesAdapter implements SystemAdapter {
         		measurements.add(new Measurement(cubesQueryExpresion.getQueryType(), measurementResultJSONArray.toString()));
             }
 		
-            /* END -- Metrics implementation */
-
         } catch (URISyntaxException e) {
             throw new uQasarException(uQasarException.UQasarExceptionType.BINDING_SYSTEM_BAD_URI_SYNTAX,bindedSystem,e.getCause());
         }  catch (RuntimeException e){
             throw new uQasarException(uQasarException.UQasarExceptionType.BINDING_SYSTEM_CONNECTION_REFUSED,bindedSystem,e.getCause());
+        }  catch (IOException e){
+            throw new uQasarException(uQasarException.UQasarExceptionType.BINDING_SYSTEM_CONNECTION_REFUSED,bindedSystem,e.getCause());
         } catch (org.codehaus.jettison.json.JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+			throw new uQasarException(uQasarException.UQasarExceptionType.ERROR_PARSING_JSON,bindedSystem,e.getCause());
+        } catch( JSONException e) {
+			throw new uQasarException(uQasarException.UQasarExceptionType.ERROR_PARSING_JSON,bindedSystem,e.getCause());
+		} 
 
         return measurements;
     }
@@ -130,119 +143,37 @@ public class CubesAdapter implements SystemAdapter {
     }
 
     
-//	public String formatIssuesResult(Iterable<BasicIssue> issues)
-//			throws JSONException {
-//		JSONArray measurementResultJSONArray = new JSONArray();
-//		for (BasicIssue issue : issues) {
-//			JSONObject i = new JSONObject();
-//			i.put("self", issue.getSelf());
-//			i.put("key", issue.getKey());
-//			measurementResultJSONArray.put(i);
-//		}
-//		return measurementResultJSONArray.toString();
-//	}  
-    
-	/**
-	 * @param url
-	 * @return
-	 */
-	public String getJSONObject(String url) {
-		return getJSONObject(url, null, null);
-	}
-
-	/**
-	 * @param url
-	 * @param obj
-	 * @return
-	 */
-	public String getJSONObject(String url, String obj) {
-		return getJSONObject(url, obj, null);
-	}
-	
-	/**
-	 * @param url
-	 * @param obj
-	 * @param member
-	 * @return
-	 */
-	public String getJSONObject(String url, String obj, String member) {
-		Resty resty = new Resty();
-		JSONResource res = null;
-		String output = null;
-		
-			try {
-				
-				url = url.replaceAll(" ", "%20");
-				
-				// GET petition to the url
-				res = resty.json(url);
-				
-				// Evaluates the provided Obj and member
-				if(obj == null){
-					// Parse to get ALL the Object
-					output = res.toObject().toString();
-				} else if(member == null){
-					// Parse to get the "obj" Object
-					output = res.toObject().getJSONObject(obj).toString();
-				} else {
-					// Parse to get the value of the "obj" within the "member"
-					output = res.toObject().getJSONObject(obj).getString(member);
-				}
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
-				return getJSONObject(url, obj,  member);
-			} catch (us.monoid.json.JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		
-		return output;
-	}
-	
-	/**
-	 * @param url
-	 * @return
-	 */
-	public String getJSONArray(String url){
-		return getJSONArray(url, null);
-	}
-    
     /**
      * @param url
-     * @param array
-     * @return
+     * @return Returns the JSON as JSON Resource
      */
-    public String getJSONArray(String url, String array){
-		Resty resty = new Resty();
-		JSONResource res = null;
-		String output = null;
-		
-			try {
-				// GET petition to the url
-				res = resty.json(url);
-				
-				// Parse to get the value of the "obj" within the "member"
-				if (array == null) {
-					output = res.array().toString();
-				} else {
-					output = res.toObject().getJSONArray(array).toString();
-				}
-				
-				value = String.valueOf(res.array().length());
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
-				return getJSONArray(url, array);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		return output;
-    }
-    
+    private JSONResource getJSON(String url) throws uQasarException{
+      JSONResource res = null;
+      Resty resty = new Resty();
+
+      // Connection counter +1
+      counter +=1;
+      
+      // Replaces spaces in URL with char %20
+      url = url.replaceAll(" ", "%20");
+
+      try {
+        res = resty.json(url);
+
+      } catch (IOException e) {
+        System.out.println(counter);
+
+        // Check if the limit of trials has been reached
+        if(counter<counterLimit){
+        return getJSON(url);} else
+          throw new uQasarException("Cubes Server is not availabe at this moument, error to connect with " +url);
+      }
+
+      // Reset the connection counter to 0
+      counter = 0;
+
+      return res;
+    }    
     
     public void printMeasurements(List<Measurement> measurements){
         String newLine = System.getProperty("line.separator");
@@ -253,53 +184,32 @@ public class CubesAdapter implements SystemAdapter {
     }
 
     //in order to invoke main from outside jar
-    //mvn exec:java -Dexec.mainClass="eu.uqasar.cubes.adapter.CubesAdapter" -Dexec.args="http://uqasar.pythonanywhere.com user:password ISSUES_PER_PROJECTS_PER_SYSTEM_INSTANCE"
+    //mvn exec:java -Dexec.mainClass="eu.uqasar.cubes.adapter.CubesAdapter" -Dexec.args="http://uqasar.pythonanywhere.com user:password cube/jira/facts"
 
     public static void main(String[] args) {
     	
-    	String[] params = new String[3];
-
-    	String[] pruebas = {
-//    			"cubes",
-				"cube/jira/aggregate?drilldown=Status&cut=Status:To Do",
-				"cube/jira/facts",
-//				"cube/jira/fact/UQ-1", 
-//				"cube/jira/model",
-//				"cube/jira/cell",
-//				"cube/jira/members/Status"
-//    			"ERRONEUS METRIC",
-    	};
-    	
-    	// URL
-    	params[0] = "http://uqasar.pythonanywhere.com";
-
-    	// Credentials (cube to query : Authentication token )
-    	params[1] = "user:password";
-
     	
         List<Measurement> measurements;
         BindedSystem bindedSystem = new BindedSystem();
-        bindedSystem.setUri(params[0]);
+        bindedSystem.setUri(args[0]);
 
         // User
         User user = new User();
-        String[] credentials = params[1].split(":");
+        
+        String[] credentials = args[1].split(":");
         user.setUsername(credentials[0]);
         user.setPassword(credentials[1]);
 
         
         try {
-        CubesAdapter cubeAdapter = new CubesAdapter();
-
-        for (String prueba : pruebas) {
-        	CubesQueryExpresion cubesQueryExpresion = new CubesQueryExpresion(prueba);
+        	CubesAdapter cubeAdapter = new CubesAdapter();
+        	CubesQueryExpresion cubesQueryExpresion = new CubesQueryExpresion(args[2]);
             measurements = cubeAdapter.query(bindedSystem,user,cubesQueryExpresion);
-        }
+            cubeAdapter.printMeasurements(measurements);
         } catch (uQasarException e) {
             e.printStackTrace();
         }
         
-        System.out.println("Ended execution");
     }
 
 }
