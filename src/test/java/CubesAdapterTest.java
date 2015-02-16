@@ -20,106 +20,99 @@ public class CubesAdapterTest {
     String bindedSystemURL = "http://uqasar.pythonanywhere.com";
     String credentials = "user:password";
     
-	String[] tests = {
-			"cubes",
-			"cube/jira/aggregate?drilldown=Status&cut=Status:Open",
-			"cube/jira/facts",
-			"cube/jira/fact/UQ-1", 
-			"cube/jira/model",
-			"cube/jira/cell",
-			"cube/jira/members/Status"
-	};
-
+    
+    @Test
+    public void queryTest_CUBES(){
+    	List<Measurement> measurements = null;
+    	
+    	try {
+			measurements = cubesAdapter.query(bindedSystemURL, credentials, "cubes");
+			cubesAdapter.printMeasurements(measurements);
+		} catch (uQasarException e) {
+			System.out.println(e.toString());
+		}
+    	
+    }
 
     @Test
-    public void queryTestAllMetrics(){
-        List<Measurement> measurements = null;
+    public void queryTest_AGGREGATE(){
+    	List<Measurement> measurements = null;
+    	
+    	try {
+    		measurements = cubesAdapter.query(bindedSystemURL, credentials, "cube/jira/aggregate?drilldown=Status&cut=Status:Open");
+    		cubesAdapter.printMeasurements(measurements);
+    	} catch (uQasarException e) {
+    		System.out.println(e.toString());
+    	}
+    	
+    }
 
+    @Test
+    public void queryTest_FACTS(){
+    	List<Measurement> measurements = null;
+    	
+    	try {
+    		measurements = cubesAdapter.query(bindedSystemURL, credentials, "cube/jira/facts");
+    		cubesAdapter.printMeasurements(measurements);
+    	} catch (uQasarException e) {
+    		System.out.println(e.toString());
+    	}
+    	
+    }
 
-            for (String metric  : tests) {
+    @Test
+    public void queryTest_FACT(){
+    	List<Measurement> measurements = null;
+    	
+    	try {
+    		measurements = cubesAdapter.query(bindedSystemURL, credentials, "cube/jira/fact/UQ-1");
+    		cubesAdapter.printMeasurements(measurements);
+    	} catch (uQasarException e) {
+    		System.out.println(e.toString());
+    	}
+    	
+    }
 
-                try{
-                measurements = cubesAdapter.query(bindedSystemURL, credentials, metric);
-                    cubesAdapter.printMeasurements(measurements);
-                }catch (uQasarException e){
-                    System.out.println(e.toString());
-                }
+    @Test
+    public void queryTest_MODEL(){
+    	List<Measurement> measurements = null;
+    	
+    	try {
+    		measurements = cubesAdapter.query(bindedSystemURL, credentials, "cube/jira/model");
+    		cubesAdapter.printMeasurements(measurements);
+    	} catch (uQasarException e) {
+    		System.out.println(e.toString());
+    	}
+    	
+    }
 
-            }
+    @Test
+    public void queryTest_CELL(){
+    	List<Measurement> measurements = null;
+    	
+    	try {
+    		measurements = cubesAdapter.query(bindedSystemURL, credentials, "cube/jira/cell");
+    		cubesAdapter.printMeasurements(measurements);
+    	} catch (uQasarException e) {
+    		System.out.println(e.toString());
+    	}
+    	
+    }
 
-
+    @Test
+    public void queryTest_MEMBER_STATUS(){
+    	List<Measurement> measurements = null;
+    	
+    	try {
+    		measurements = cubesAdapter.query(bindedSystemURL, credentials, "cube/jira/members/Status");
+    		cubesAdapter.printMeasurements(measurements);
+    	} catch (uQasarException e) {
+    		System.out.println(e.toString());
+    	}
+    	
     }
 
 
-//    @Test
-//    public void queryTestPROJECTS_PER_SYSTEM_INSTANCE(){
-//        List<Measurement> measurements = null;
-//            try{
-//                measurements = cubesAdapter.query(bindedSystemURL, credentials, "PROJECTS_PER_SYSTEM_INSTANCE");
-//                cubesAdapter.printMeasurements(measurements);
-//            }catch (uQasarException e){
-//                System.out.println(e.toString());
-//            }
-//    }
-//
-//
-//    @Test
-//    public void queryTestISSUES_PER_PROJECTS_PER_SYSTEM_INSTANCE(){
-//        List<Measurement> measurements = null;
-//        try{
-//            measurements = cubesAdapter.query(bindedSystemURL, credentials, "ISSUES_PER_PROJECTS_PER_SYSTEM_INSTANCE");
-//            cubesAdapter.printMeasurements(measurements);
-//        }catch (uQasarException e){
-//            System.out.println(e.toString());
-//        }
-//    }
-//
-//    @Test
-//    public void queryTestFIXED_ISSUES_PER_PROJECT(){
-//        List<Measurement> measurements = null;
-//        try{
-//            measurements = cubesAdapter.query(bindedSystemURL, credentials, "FIXED_ISSUES_PER_PROJECT");
-//            cubesAdapter.printMeasurements(measurements);
-//        }catch (uQasarException e){
-//            System.out.println(e.toString());
-//        }
-//    }
-//
-//    @Test
-//    public void queryTestUNRESOLVED_ISSUES_PER_PROJECT(){
-//        List<Measurement> measurements = null;
-//        try{
-//            measurements = cubesAdapter.query(bindedSystemURL, credentials, "UNRESOLVED_ISSUES_PER_PROJECT");
-//            cubesAdapter.printMeasurements(measurements);
-//        }catch (uQasarException e){
-//            System.out.println(e.toString());
-//        }
-//    }
-//
-//    @Test
-//    public void queryTestUNRESOLVED_BUG_ISSUES_PER_PROJECT(){
-//        List<Measurement> measurements = null;
-//        try{
-//            measurements = cubesAdapter.query(bindedSystemURL, credentials, "UNRESOLVED_BUG_ISSUES_PER_PROJECT");
-//            cubesAdapter.printMeasurements(measurements);
-//        }catch (uQasarException e){
-//            System.out.println(e.toString());
-//        }
-//    }
-//
-//    @Test
-//    public void queryTestUNRESOLVED_TASK_ISSUES_PER_PROJECT(){
-//        List<Measurement> measurements = null;
-//        try{
-//            measurements = cubesAdapter.query(bindedSystemURL, credentials, "UNRESOLVED_TASK_ISSUES_PER_PROJECT");
-//            cubesAdapter.printMeasurements(measurements);
-//        }catch (uQasarException e){
-//            System.out.println(e.toString());
-//        }
-//    }
-
-
-    // Try to pass a non existing metric
     @Test
     public void queryTest_erroneus_metric(){
 
