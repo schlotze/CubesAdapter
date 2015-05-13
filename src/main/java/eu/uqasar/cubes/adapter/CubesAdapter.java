@@ -28,6 +28,7 @@ import eu.uqasar.adapter.query.QueryExpression;
  * Cubes Adapter
  * 
  * Based on https://github.com/IntrasoftInternational/JiraAdapter
+ * Implementing interface https://github.com/IntrasoftInternational/uQasarAdapter
  * 
  */
 
