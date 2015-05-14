@@ -1,3 +1,5 @@
+package eu.uqasar.cubes.adapter;
+
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
