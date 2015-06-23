@@ -2,3 +2,4 @@
 .pmd
 .settings/
 /.classpath
+.project

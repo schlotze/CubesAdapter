@@ -25,7 +25,7 @@ import eu.uqasar.adapter.query.QueryExpression;
  * 
  * Manu Garcia <mgarcia@innopole.net>
  * 
- * Cubes Adapter
+ *  Cubes Adapter
  * 
  * Based on https://github.com/IntrasoftInternational/JiraAdapter
  * Implementing interface https://github.com/IntrasoftInternational/uQasarAdapter
@@ -34,26 +34,32 @@ import eu.uqasar.adapter.query.QueryExpression;
 
 public class CubesAdapter implements SystemAdapter {
 
-	String value = "";
-	  // Counts the number of trials to connect to Rest service, and limits them to 10
-	  private Integer counter = 0;
-	  private Integer counterLimit = 10;
+	// Counts the number of trials to connect to Cubes server 
+	private int counter = 0;
+	// Limits counts to 10
+	private int counterLimit = 10;
 	
+	// Main constructor
     public CubesAdapter() {
     }
 
     @Override
     public List<Measurement> query(BindedSystem bindedSystem, User user, QueryExpression queryExpression) throws uQasarException {
-
+    	// Number of elements that match the proposed query 
+    	int  value = 0; 
+    	// Collection of measurements
         LinkedList<Measurement> measurements = new LinkedList<Measurement>();
+        // Retrieved JSON  
         JSONResource jsonResource = null;
+        // Single measure
         String measurement = "";
         String url = "";
+        
         
         CubesQueryExpresion cubesQueryExpresion = (CubesQueryExpresion) queryExpression;
 
         try {
-        	URI uri = new URI(bindedSystem.getUri());
+        	final URI uri = new URI(bindedSystem.getUri());
         	url = uri.toString();
         	
         	// check if the provided URL ends with "/"
@@ -65,13 +71,11 @@ public class CubesAdapter implements SystemAdapter {
             jsonResource = getJSON(url + cubesQueryExpresion.getQuery());
             
             /* Parse the JSON resource */
-            
             if (cubesQueryExpresion.getQueryType() == uQasarMetric.AGGREGATE){			//JSONObject
-            	
 				// Parse to get ALL the Object
 				measurement = jsonResource.toObject().toString();
 				// Parse to get the value of the "obj" within the "member"
-				value = jsonResource.toObject().getJSONObject("summary").getString("count");
+				value = Integer.valueOf(jsonResource.toObject().getJSONObject("summary").getString("count"));
             	
             }   else if (cubesQueryExpresion.getQueryType() == uQasarMetric.FACT ||		//JSONObject
             		cubesQueryExpresion.getQueryType() == uQasarMetric.MEMBERS|| 
@@ -85,20 +89,20 @@ public class CubesAdapter implements SystemAdapter {
             	// Stores the JSON Array 
 				measurement = jsonResource.array().toString();
 				// Count the array elements and set value  
-				value = String.valueOf(jsonResource.array().length());
+				value = jsonResource.array().length();
 				
             } else {
             	throw new uQasarException(uQasarException.UQasarExceptionType.UQASAR_NOT_EXISTING_METRIC,cubesQueryExpresion.getQuery());
             }
 
             if(measurement != null){
-            	 JSONArray measurementResultJSONArray = new JSONArray();
-            	 JSONObject bp = new JSONObject();
+            	 final JSONArray measurementResultJSONArray = new JSONArray();
+            	 final JSONObject bp = new JSONObject();
             	 bp.put("self",url + cubesQueryExpresion.getQuery() );
             	 bp.put("key",cubesQueryExpresion.getQueryType() );
             	 bp.put("name",cubesQueryExpresion.getCubeName());
             	 bp.put("jsonContent", measurement);
-            	 bp.put("value", value);
+            	 bp.put("value", String.valueOf(value));
             	 measurementResultJSONArray.put(bp);
 
             	 // Retrieved measurement is stored in List 
@@ -123,23 +127,20 @@ public class CubesAdapter implements SystemAdapter {
     
     @Override
     public List<Measurement> query(String bindedSystemURL, String credentials, String queryExpression) throws uQasarException {
-        List<Measurement> measurements = null;
 
-        BindedSystem bindedSystem = new BindedSystem();
+        final BindedSystem bindedSystem = new BindedSystem();
         bindedSystem.setUri(bindedSystemURL);
-        User user = new User();
+        final User user = new User();
 
-        String[] creds = credentials.split(":");
+        final String[] creds = credentials.split(":");
 
         user.setUsername(creds[0]);
         user.setPassword(creds[1]);
 
-        CubesQueryExpresion cubesQueryExpresion = new CubesQueryExpresion(queryExpression);
-        CubesAdapter cubesAdapter = new CubesAdapter();
+        final CubesQueryExpresion cubesQueryExpresion = new CubesQueryExpresion(queryExpression);
+        final CubesAdapter cubesAdapter = new CubesAdapter();
 
-        measurements = cubesAdapter.query(bindedSystem,user,cubesQueryExpresion);
-
-        return measurements;
+        return cubesAdapter.query(bindedSystem,user,cubesQueryExpresion);
     }
 
     
@@ -149,7 +150,7 @@ public class CubesAdapter implements SystemAdapter {
      */
     private JSONResource getJSON(String url) throws uQasarException{
       JSONResource res = null;
-      Resty resty = new Resty();
+      final Resty resty = new Resty();
 
       // Connection counter +1
       counter +=1;
@@ -161,11 +162,13 @@ public class CubesAdapter implements SystemAdapter {
         res = resty.json(url);
 
       } catch (IOException e) {
-
         // Check if the limit of trials has been reached
-        if(counter<counterLimit){
-        return getJSON(url);} else
-          throw new uQasarException("Cubes Server is not availabe at this moument, error to connect with " +url);
+			if (counter < counterLimit) {
+				return getJSON(url);
+			} else {
+				throw new uQasarException("Cubes Server is not availabe " +
+						"at this moument, error to connect with " + url);
+			}
       }
 
       // Reset the connection counter to 0
@@ -175,8 +178,8 @@ public class CubesAdapter implements SystemAdapter {
     }    
     
     public void printMeasurements(List<Measurement> measurements){
-        String newLine = System.getProperty("line.separator");
-        for (Measurement measurement : measurements) {
+        final String newLine = System.getProperty("line.separator");
+        for (final Measurement measurement : measurements) {
             System.out.println(measurement.getMeasurement()+newLine);
 
         }
@@ -184,25 +187,23 @@ public class CubesAdapter implements SystemAdapter {
 
     //in order to invoke main from outside jar
     //mvn exec:java -Dexec.mainClass="eu.uqasar.cubes.adapter.CubesAdapter" -Dexec.args="http://uqasar.pythonanywhere.com user:password cube/jira/facts"
-
     public static void main(String[] args) {
     	
     	
         List<Measurement> measurements;
-        BindedSystem bindedSystem = new BindedSystem();
+        final BindedSystem bindedSystem = new BindedSystem();
         bindedSystem.setUri(args[0]);
 
         // User
-        User user = new User();
+        final User user = new User();
         
-        String[] credentials = args[1].split(":");
+        final String[] credentials = args[1].split(":");
         user.setUsername(credentials[0]);
         user.setPassword(credentials[1]);
-
         
         try {
-        	CubesAdapter cubeAdapter = new CubesAdapter();
-        	CubesQueryExpresion cubesQueryExpresion = new CubesQueryExpresion(args[2]);
+        	final CubesAdapter cubeAdapter = new CubesAdapter();
+        	final CubesQueryExpresion cubesQueryExpresion = new CubesQueryExpresion(args[2]);
             measurements = cubeAdapter.query(bindedSystem,user,cubesQueryExpresion);
             cubeAdapter.printMeasurements(measurements);
         } catch (uQasarException e) {

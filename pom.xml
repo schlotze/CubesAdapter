@@ -78,4 +78,19 @@
             </plugin>
         </plugins>
     </build>
+    <url>https://github.com/ManuDevelopia/CubesAdapter</url>
+    <description>CubesAdapter connects Cubes Data Brewery (http://cubes.databrewery.org/) server with U-Qasar Platform</description>
+    <scm>
+    	<url>https://github.com/ManuDevelopia/CubesAdapter.git</url>
+    	<connection>Git</connection>
+    	<developerConnection>ManuDevelopia</developerConnection>
+    </scm>
+    <issueManagement>
+    	<system>Jira</system>
+    	<url>http://uqasar.atlassian.net</url>
+    </issueManagement>
+    <ciManagement>
+    	<system>Jenkins</system>
+    	<url>http://server.innopole.eu/jenkins</url>
+    </ciManagement>
 </project>
