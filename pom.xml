@@ -5,6 +5,10 @@
     <artifactId>CubesAdapter</artifactId>
     <version>1.0</version>
     <name>CubesAdapter</name>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
     <repositories>
         <!-- Local Maven Repository; modify as required -->
         <repository>
