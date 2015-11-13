@@ -7,10 +7,19 @@
     <version>1.0</version>
     <name>CubesAdapter</name>
 
+    <repositories>
+		<!-- Local Maven Repository; modify as required -->
+		<repository>
+			<id>internal-repository</id>
+			<name>Internal repo</name>
+			<url>http://www.atb-bremen.de/artifactory/ext-releases-local/</url>
+		</repository>
+	</repositories>
+
     <dependencies>
         <!-- U-Qasar adapter Interface -->
         <dependency>
-            <groupId>uQasarAdapter</groupId>
+            <groupId>eu.uqasar.adapter.uQasarAdapter</groupId>
             <artifactId>uQasarAdapter</artifactId>
             <version>2.0.3</version>
         </dependency>
@@ -21,14 +30,14 @@
             <artifactId>resty</artifactId>
             <version>0.3.2</version>
         </dependency>
-                
+
         <!-- JSON manipulation -->
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.1</version>
         </dependency>
-                
+
         <!-- JUnit Testing -->
         <dependency>
             <groupId>junit</groupId>
