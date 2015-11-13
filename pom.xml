@@ -1,21 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>CubesAdapter</groupId>
     <artifactId>CubesAdapter</artifactId>
     <version>1.0</version>
     <name>CubesAdapter</name>
-
     <repositories>
-		<!-- Local Maven Repository; modify as required -->
-		<repository>
-			<id>internal-repository</id>
-			<name>Internal repo</name>
-			<url>http://www.atb-bremen.de/artifactory/ext-releases-local/</url>
-		</repository>
-	</repositories>
-
+        <!-- Local Maven Repository; modify as required -->
+        <repository>
+            <id>internal-repository</id>
+            <name>Internal repo</name>
+            <url>http://www.atb-bremen.de/artifactory/ext-releases-local/</url>
+        </repository>
+    </repositories>
     <dependencies>
         <!-- U-Qasar adapter Interface -->
         <dependency>
@@ -23,21 +20,18 @@
             <artifactId>uQasarAdapter</artifactId>
             <version>2.0.3</version>
         </dependency>
-
         <!-- Resty - REST support -->
         <dependency>
             <groupId>us.monoid.web</groupId>
             <artifactId>resty</artifactId>
             <version>0.3.2</version>
         </dependency>
-
         <!-- JSON manipulation -->
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.1</version>
         </dependency>
-
         <!-- JUnit Testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -46,7 +40,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -71,7 +64,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -85,21 +77,38 @@
                     <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <format>xml</format>
+                    <maxmem>256m</maxmem>
+                    <!-- aggregated reports for multi-module projects -->
+                    <aggregate>true</aggregate>
+                    <check />
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.eluder.coveralls</groupId>
+                <artifactId>coveralls-maven-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
         </plugins>
     </build>
     <url>https://github.com/ManuDevelopia/CubesAdapter</url>
     <description>CubesAdapter connects Cubes Data Brewery (http://cubes.databrewery.org/) server with U-Qasar Platform</description>
     <scm>
-    	<url>https://github.com/ManuDevelopia/CubesAdapter.git</url>
-    	<connection>Git</connection>
-    	<developerConnection>ManuDevelopia</developerConnection>
+        <url>https://github.com/ManuDevelopia/CubesAdapter.git</url>
+        <connection>Git</connection>
+        <developerConnection>ManuDevelopia</developerConnection>
     </scm>
     <issueManagement>
-    	<system>Jira</system>
-    	<url>http://uqasar.atlassian.net</url>
+        <system>Jira</system>
+        <url>http://uqasar.atlassian.net</url>
     </issueManagement>
     <ciManagement>
-    	<system>Jenkins</system>
-    	<url>http://server.innopole.eu/jenkins</url>
+        <system>Jenkins</system>
+        <url>http://server.innopole.eu/jenkins</url>
     </ciManagement>
 </project>
