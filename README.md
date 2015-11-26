@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/ManuDevelopia/CubesAdapter.svg?branch=master)](https://travis-ci.org/ManuDevelopia/CubesAdapter)
 [![Coverage Status](https://coveralls.io/repos/ManuDevelopia/CubesAdapter/badge.svg?branch=master&service=github)](https://coveralls.io/github/ManuDevelopia/CubesAdapter?branch=master)
+[![Dependency Status](https://www.versioneye.com/user/projects/5656ef30ff016c002c001cd8/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5656ef30ff016c002c001cd8)
 
 CubesAdapter
 ===========
